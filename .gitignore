@@ -1,0 +1,9 @@
+# .gitignore standard for ICS Software Engineering
+
+# Ignore Intellij Project Files
+*.iml
+.idea/
+
+# If on a Mac, ignore DS_Store
+.DS_Store
+
