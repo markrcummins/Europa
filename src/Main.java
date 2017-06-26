@@ -16,42 +16,50 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeType;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import java.util.Scanner;
 import static java.lang.Math.random;
 
 
 
 public class Main extends Application {
 
+
   @Override
   public void start(Stage primaryStage) throws Exception{
+    Ambient ambient = new Ambient(99, 99, 99);
     Group root = new Group();
     Scene scene = new Scene(root, 800, 600, Color.BLACK);
     primaryStage.setTitle("Ambient Interface E U R O P A");
     primaryStage.setScene(scene);
 
+
+    //Initializing circles
     Group circles = new Group();
     for(int i = 0; i < 30; i++) {
       Circle circle = new Circle(150, Color.web("white", 0.05));
       circle.setStrokeType(StrokeType.OUTSIDE);
-      circle.setStroke(Color.web("white", 0.16));
+      circle.setStroke(Color.web("white", 0.5));
       circle.setStrokeWidth(4);
       circles.getChildren().add(circle);
 
     }
+    //Background rectangle gradient that shows color when circles are on top of it
     Rectangle colors = new Rectangle(scene.getWidth(), scene.getHeight(),
-        new LinearGradient(0f, 1f, 1f, 0f, true, CycleMethod.NO_CYCLE, new Stop[] {
-            new Stop(0, Color.web("#f8bd55")),
-            new Stop(0.14, Color.web("#c0fe56")),
-            new Stop(0.28, Color.web("#5dfbc1")),
-            new Stop(0.43, Color.web("#64c2f8")),
-            new Stop(0.57, Color.web("#be4af7")),
-            new Stop(0.71, Color.web("#ed5fc2")),
-            new Stop(0.85, Color.web("#ef504c")),
-            new Stop(1, Color.web("#f2660f")),
-        }));
+        //new LinearGradient(0f, 1f, 1f, 0f, true, CycleMethod.NO_CYCLE, new Stop[] {
+            //new Stop(0, Color.web("#f8bd55")),
+            //new Stop(0.14, Color.web("#c0fe56")),
+            //new Stop(0.28, Color.web("#5dfbc1")),
+            //new Stop(0.43, Color.web("#64c2f8")),
+            //new Stop(0.57, Color.web("#be4af7")),
+            //new Stop(0.71, Color.web("#ed5fc2")),
+            //new Stop(0.85, Color.web("#ef504c")),
+            //new Stop(1, Color.web("#f2660f")),
+        //}
+        Color.web("#1aff8c"));
     colors.widthProperty().bind(scene.widthProperty());
     colors.heightProperty().bind(scene.heightProperty());
 
+    //Blending the colors
     Group blendModeGroup =
         new Group(new Group(new Rectangle(scene.getWidth(), scene.getHeight(),
             Color.BLACK), circles), colors);
@@ -62,24 +70,70 @@ public class Main extends Application {
     primaryStage.show();
 
     Timeline timeline = new Timeline();
-    for(Node circle: circles.getChildren()) {
-      timeline.getKeyFrames().addAll(
-          new KeyFrame(Duration.ZERO,
-              new KeyValue(circle.translateXProperty(), random() * 800),
-              new KeyValue(circle.translateYProperty(), random() * 600)
-          ),
-          new KeyFrame(new Duration(40000),
-              new KeyValue(circle.translateXProperty(), random() * 800),
-              new KeyValue(circle.translateYProperty(), random() * 600)
-          )
-      );
-    }
-    //40 seconds of animation
-    timeline.play();
+    //while(true)
+   // while (true) {
+
+      for (Node circle : circles.getChildren()) {
+
+        timeline.getKeyFrames().addAll(
+
+            new KeyFrame(Duration.ZERO,
+                new KeyValue(circle.translateXProperty(), random() * 800),
+                new KeyValue(circle.translateYProperty(), random() * 600)
+            ),
+
+            new KeyFrame(new Duration(40000),
+                new KeyValue(circle.translateXProperty(), random() * 800),
+                new KeyValue(circle.translateYProperty(), random() * 600)
+            )
+
+        );
+
+      }
+
+      //40 seconds of animation
+      timeline.play();
   }
 
 
+
   public static void main(String[] args) {
+   // System.out.println("Oh yey");
     launch(args);
+  }
+
+  private Color makeColor(int num) {
+    Color
+    if(num < 10 && num >= 0) {
+      // Be VERY violet
+    }
+    if(num < 20 && num >= 10) {
+      // Be less violet
+    }
+    if(num < 30 && num >= 20) {
+      // Be even LESS violet
+    }
+    if(num < 40 && num >= 30) {
+      // Be barely violet
+    }
+    if(num < 50 && num >= 40) {
+      // Basically white
+    }
+    if(num < 60 && num >= 50) {
+      // Barely Red
+    }
+    if(num < 70 && num >= 60) {
+      // Be  even less red
+    }
+    if(num < 80 && num >= 70) {
+      // Be less red
+    }
+    if(num < 90 && num >= 80) {
+      //Red
+    }
+    if(num < 100 && num >= 90) {
+      // Bright red lipstick
+    }
+    return
   }
 }
