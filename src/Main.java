@@ -2,11 +2,14 @@ import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.application.Application;
+import javafx.geometry.*;
+import javafx.geometry.Insets;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.effect.BlendMode;
 import javafx.scene.effect.BoxBlur;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
@@ -16,124 +19,74 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeType;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import java.awt.*;
 import java.util.Scanner;
 import static java.lang.Math.random;
 
-
+import java.net.URL;
 
 public class Main extends Application {
 
 
-  @Override
-  public void start(Stage primaryStage) throws Exception{
-    Ambient ambient = new Ambient(99, 99, 99);
-    Group root = new Group();
-    Scene scene = new Scene(root, 800, 600, Color.BLACK);
-    primaryStage.setTitle("Ambient Interface E U R O P A");
-    primaryStage.setScene(scene);
 
-
-    //Initializing circles
-    Group circles = new Group();
-    for(int i = 0; i < 30; i++) {
-      Circle circle = new Circle(150, Color.web("white", 0.05));
-      circle.setStrokeType(StrokeType.OUTSIDE);
-      circle.setStroke(Color.web("white", 0.5));
-      circle.setStrokeWidth(4);
-      circles.getChildren().add(circle);
-
-    }
-    //Background rectangle gradient that shows color when circles are on top of it
-    Rectangle colors = new Rectangle(scene.getWidth(), scene.getHeight(),
-        //new LinearGradient(0f, 1f, 1f, 0f, true, CycleMethod.NO_CYCLE, new Stop[] {
-            //new Stop(0, Color.web("#f8bd55")),
-            //new Stop(0.14, Color.web("#c0fe56")),
-            //new Stop(0.28, Color.web("#5dfbc1")),
-            //new Stop(0.43, Color.web("#64c2f8")),
-            //new Stop(0.57, Color.web("#be4af7")),
-            //new Stop(0.71, Color.web("#ed5fc2")),
-            //new Stop(0.85, Color.web("#ef504c")),
-            //new Stop(1, Color.web("#f2660f")),
-        //}
-        Color.web("#1aff8c"));
-    colors.widthProperty().bind(scene.widthProperty());
-    colors.heightProperty().bind(scene.heightProperty());
-
-    //Blending the colors
-    Group blendModeGroup =
-        new Group(new Group(new Rectangle(scene.getWidth(), scene.getHeight(),
-            Color.BLACK), circles), colors);
-    colors.setBlendMode(BlendMode.OVERLAY);
-    root.getChildren().add(blendModeGroup);
-    circles.setEffect(new BoxBlur(10, 10, 3));
-
-    primaryStage.show();
-
-    Timeline timeline = new Timeline();
-    //while(true)
-   // while (true) {
-
-      for (Node circle : circles.getChildren()) {
-
-        timeline.getKeyFrames().addAll(
-
-            new KeyFrame(Duration.ZERO,
-                new KeyValue(circle.translateXProperty(), random() * 800),
-                new KeyValue(circle.translateYProperty(), random() * 600)
-            ),
-
-            new KeyFrame(new Duration(40000),
-                new KeyValue(circle.translateXProperty(), random() * 800),
-                new KeyValue(circle.translateYProperty(), random() * 600)
-            )
-
-        );
-
-      }
-
-      //40 seconds of animation
-      timeline.play();
-  }
-
-
-
-  public static void main(String[] args) {
-   // System.out.println("Oh yey");
+  public static void main(String... args) {
     launch(args);
   }
+  Button button1;
+  Button button2;
+  Button button3;
+  Scene scene;
+  Stage window;
+  Scanner scan;
 
-  private Color makeColor(int num) {
-    Color
-    if(num < 10 && num >= 0) {
-      // Be VERY violet
-    }
-    if(num < 20 && num >= 10) {
-      // Be less violet
-    }
-    if(num < 30 && num >= 20) {
-      // Be even LESS violet
-    }
-    if(num < 40 && num >= 30) {
-      // Be barely violet
-    }
-    if(num < 50 && num >= 40) {
-      // Basically white
-    }
-    if(num < 60 && num >= 50) {
-      // Barely Red
-    }
-    if(num < 70 && num >= 60) {
-      // Be  even less red
-    }
-    if(num < 80 && num >= 70) {
-      // Be less red
-    }
-    if(num < 90 && num >= 80) {
-      //Red
-    }
-    if(num < 100 && num >= 90) {
-      // Bright red lipstick
-    }
-    return
+  @Override
+  public void start(Stage primaryStage) throws Exception {
+    window = primaryStage;
+    window.setTitle("thenewboston");
+
+    //Form
+    TextField colorInput = new TextField();
+    TextField brightnessInput = new TextField();
+    TextField soundInput = new TextField();
+
+    button1 = new Button("Enter Color");
+    button2 = new Button("Enter Brightness");
+    button3 = new Button("Enter Sound");
+    button1.setOnAction(e -> isInt(colorInput, colorInput.getText()));
+    button2.setOnAction(e -> isInt(brightnessInput, brightnessInput.getText()));
+    button3.setOnAction(e -> isInt(soundInput, soundInput.getText()));
+    //Layout
+    VBox layout = new VBox(10);
+    layout.setPadding(new Insets(20, 20,20,20));
+    layout.getChildren().addAll(colorInput, button1);
+    layout.getChildren().addAll(brightnessInput, button2);
+    layout.getChildren().addAll(soundInput, button3);
+    scene = new Scene(layout, 300, 250);
+    window.setScene(scene);
+    window.show();
+
   }
+
+  private boolean isInt(TextField input, String message) {
+    try {
+
+      int range = Integer.parseInt(input.getText());
+      if(range < 100 && range >= 0) {
+        System.out.println("User inputted: " + range);
+        return true;
+      }
+      else {
+        System.out.println("Please input a number between 0 to 99.");
+        return false;
+      }
+    }catch(NumberFormatException e){
+      System.out.println("Error: " + message + " is not a number");
+      return false;
+    }
+  }
+
+  //private
 }
