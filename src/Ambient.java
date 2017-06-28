@@ -22,12 +22,12 @@ public class Ambient
 {
   private int colorVariance;
   private int brightnessVariance;
-  private int soundVariance;
+  // private int soundVariance;
 
-  public Ambient(int colorVariance, int brightnessVariance, int soundVariance) {
+  public Ambient(int colorVariance, int brightnessVariance) {
     this.colorVariance = colorVariance;
     this.brightnessVariance = brightnessVariance;
-    this.soundVariance = soundVariance;
+    //this.soundVariance = soundVariance;
   }
 
   public int getColor() {
@@ -36,17 +36,11 @@ public class Ambient
   public int getBrightness() {
     return brightnessVariance;
   }
-  public int getSound() {
-    return soundVariance;
-  }
   public void setColor(int num) {
     colorVariance = num;
   }
   public void setBrightness(int num) {
     brightnessVariance = num;
-  }
-  public void setSound(int num) {
-    soundVariance = num;
   }
 
 }
