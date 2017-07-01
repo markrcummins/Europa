@@ -36,6 +36,7 @@ public class Main extends Application {
   public static void main(String... args) {
     launch(args);
   }
+
   Button button1;
   Button button2;
   Scene scene;
@@ -77,6 +78,7 @@ public class Main extends Application {
         }
         //return ambient;
     });
+    //what the
     //button2.setOnAction(e -> isInt(brightnessInput, brightnessInput.getText()));
     //Layout
 
@@ -103,7 +105,7 @@ public class Main extends Application {
         return false;
       }
     }catch(NumberFormatException e){
-      System.out.println("Error: " + message + " is not a number");
+      System.out.println("Error: " + message + " is not an integer");
       return false;
     }
   }
