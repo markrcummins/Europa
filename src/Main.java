@@ -4,12 +4,14 @@ import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.geometry.*;
 import javafx.geometry.Insets;
+import javafx.scene.control.Slider;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.effect.BlendMode;
 import javafx.scene.effect.BoxBlur;
 import javafx.scene.layout.VBox;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
@@ -27,6 +29,9 @@ import javafx.scene.control.TextField;
 import java.awt.*;
 import java.util.Scanner;
 import static java.lang.Math.random;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -36,6 +41,7 @@ import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.io.File;
 import java.io.*;
+import java.util.concurrent.TimeUnit.*;
 
 import java.net.URL;
 
@@ -50,8 +56,12 @@ public class Main extends Application {
   Button button1;
   Button button2;
   Button choiceButton;
+  Button settingsButton;
+  Button confirmButton;
   ChoiceBox<String> choiceBox;
   Scene scene;
+  Scene choiceScene;
+  Scene chosenScene;
   Scene colorScene;
   Stage window;
   Scanner scan;
@@ -61,8 +71,10 @@ public class Main extends Application {
   boolean validColorInput;
   boolean validBrightnessInput;
   Group root;
-  TextField colorInput;
+  int colorInput;
   TextField brightnessInput;
+  int redNumber;
+  int purpleNumber;
 
   @Override
   public void start(Stage primaryStage) throws Exception {
@@ -71,7 +83,7 @@ public class Main extends Application {
     window.setTitle("Europa Ambient Device");
 
     //Form
-    colorInput = new TextField();
+    //colorInput = new TextField();
     brightnessInput = new TextField();
 
     button1 = new Button("Submit");
@@ -85,52 +97,77 @@ public class Main extends Application {
 
     choiceBox.setValue("King's River Inflow/Outflow");
 
+    // SECOND SCENE THAT SHOWS BASED ON CHOICE
     choiceButton.setOnAction(e -> {
-      getChoice(choiceBox);
+
+      choiceScene = getChoice(choiceBox);
+      window.setScene(choiceScene);
+
+        settingsButton.setOnAction(k -> {
+          colorScene = ambientScene();
+          window.setScene(confirmScene());
+            confirmButton.setOnAction(m -> {
+              window.setScene(colorScene);
+              /*try {
+                Thread.sleep(5000);
+                System.out.println("Hey");
+                while(true) {
+                  System.out.println("Hey");
+                  ambient.setColor(99);
+
+                }
+
+              }
+              catch(Exception z) {
+                System.out.println("What's goin on?????");
+              }
+              ambient.setColor(99);
+              */
+              //window.setScene(colorScene);
+              /*while(true) {
+                try {
+                  Thread.sleep(5000);
+                  System.out.println("Hey");
+                  ambient.setColor(getKingRiverData());
+
+                }
+                catch(Exception z) {
+                  System.out.println("What's goin on?????");
+                }
+              }*/
+            });
+        });
+
+      System.out.println("Hey" + redNumber);
+      System.out.println("You" + purpleNumber);
     });
 
-
-    button1.setOnAction(e -> {
-        validColorInput = isInt(colorInput, colorInput.getText());
-        validBrightnessInput = isInt(brightnessInput, brightnessInput.getText());
-        if(validColorInput && validBrightnessInput) {
-          ambient = new Ambient(Integer.parseInt(colorInput.getText()), Integer.parseInt(brightnessInput.getText()));
-          System.out.println(ambient.getColor());
-          System.out.println(ambient.getBrightness());
-          System.out.println(ambient.getColor());
-          System.out.println(inputToColor(ambient.getColor()));
-          colorRectangle = new Rectangle(scene.getWidth() - 100, scene.getHeight() - 100, inputToColor(ambient.getColor()));
-          root = new Group();
-          root.getChildren().add(colorRectangle);
-          colorScene = new Scene(root, 300, 250, Color.BLACK);
-          window.setScene(colorScene);
-        }
-
-    });
-
+    //FIRST SCENE THAT SHOWS
     VBox layout = new VBox(10);
     layout.setPadding(new Insets(20, 20, 20, 20));
     layout.getChildren().addAll(choiceBox, choiceButton);
     scene = new Scene(layout, 300, 250);
     window.setScene(scene);
     window.show();
-
-    final Document doc = Jsoup.connect("http://www.spk-wc.usace.army.mil/fcgi-bin/hourly.py?report=pnf&textonly=true").get();
-    //parse the webpage by spaces into one row of the 2d array
-    //When there's a newline, parse the next line into the next row
-    String str = doc.select("body").text();
-    String strArray[] = str.split("\\s+");
-
-    System.out.println("**************************************");
-    System.out.println(averageInflow(strArray));
-    System.out.println("**************************************");
-    System.out.println(averageOutflow(strArray));
-
-
   }
 
   //********** STATIC METHODS **********//
 
+  private Scene confirmScene() {
+    VBox layout = new VBox(10);
+    layout.setPadding(new Insets(20, 20, 20, 20));
+    confirmButton = new Button("Confirm Ambient Device");
+    layout.getChildren().addAll(confirmButton);
+    Scene confirmScene = new Scene(layout, 300, 250);
+    return confirmScene;
+  }
+  private Scene ambientScene() {
+    //settingsButton.setOnAction(e -> {
+      chosenScene = kingRiverScene(purpleNumber, redNumber, getKingRiverData());
+    //});
+    return chosenScene;
+
+  }
   private Scene getChoice(ChoiceBox<String> choiceBox) {
     //initialzed with empty scene to make Java happy
     //VBox layout = new VBox();
@@ -138,55 +175,213 @@ public class Main extends Application {
 
     //Gonna assign choices to a number so that it's easier to set different scenes later on
     if(choiceBox.getValue().equals("King's River Inflow/Outflow")) {
-      userChoice = kingRiverScene();
+      userChoice = kingRiverSettings();
     }
    else if(choiceBox.getValue().equals("BitCoin Tracker")) {
-      userChoice = bitCoinScene();
+      //Temporary fix
+      //userChoice = bitCoinScene();
+      userChoice = kingRiverSettings();
     }
     else if(choiceBox.getValue().equals("Ethereum Tracker")) {
-      userChoice = ethereumScene();
+      //Temporary fix
+      //userChoice = ethereumScene();
+      userChoice = kingRiverSettings();
     }
     else { //if the choice was the DogeCoin Traker
-      userChoice = dogeCoinScene();
+      //Temporary fix
+      //userChoice = dogeCoinScene();
+      userChoice = kingRiverSettings();
     }
 
     return userChoice;
   }
 
-  private Scene kingRiverScene() {
-    VBox layout = new VBox(10);
-    layout.setPadding(new Insets(20, 20,20,20));
-    layout.getChildren().addAll(colorInput, brightnessInput, button1);
+  private Scene kingRiverScene(int purpleRange, int redRange, int data) {
+    double purpleInput = data/purpleRange;
+    double redInput = data/redRange;
+    //colorInput
+    if(purpleInput <= 1) {
+      colorInput = 0;
+    }
+    else if (redInput >= 1) {
+      colorInput = 99;
+    }
+    else { colorInput = (int) data;
+
+    }
+
+    ambient = new Ambient(colorInput, colorInput);
+    colorRectangle = new Rectangle(scene.getWidth() - 100, scene.getHeight() - 100, inputToColor(ambient.getColor()));
+    root = new Group();
+    root.getChildren().add(colorRectangle);
+    colorScene = new Scene(root, 300, 250, Color.BLACK);
+
+
+    //layout.getChildren().addAll(colorInput, brightnessInput, button1);
     //layout.getChildren().addAll(brightnessInput, button2);
-    scene = new Scene(layout, 300, 250);
-    return scene;
+
+    return colorScene;
   }
 
-  private Scene bitCoinScene() {
-    VBox layout = new VBox(10);
-    layout.setPadding(new Insets(20, 20,20,20));
-    layout.getChildren().addAll(colorInput, brightnessInput, button1);
-    //layout.getChildren().addAll(brightnessInput, button2);
-    scene = new Scene(layout, 300, 250);
-    return scene;
+  private Scene kingRiverSettings() {
+    Slider redThreshold = new Slider( 0,100, 8);
+    Label redCaption = new Label("Infield/Outfield Red Light Threshold: ");
+    Label redValue = new Label(Double.toString(redThreshold.getValue()));
+
+    Slider purpleThreshold = new Slider(0, 100, 7);
+    Label purpleCaption = new Label("Infield/Outfield Purple Light Threshold");
+    Label purpleValue = new Label(Double.toString(purpleThreshold.getValue()));
+
+    Color textColor = Color.BLACK;
+    Group root = new Group();
+    Scene settings = new Scene(root, 600, 600);
+    GridPane grid = new GridPane();
+    grid.setPadding(new Insets(10, 10, 10, 10));
+    grid.setVgap(10);
+    grid.setHgap(70);
+    settings.setRoot(grid);
+
+    redCaption.setTextFill(textColor);
+    purpleCaption.setTextFill(textColor);
+    GridPane.setConstraints(redCaption, 0, 1);
+    grid.getChildren().add(redCaption);
+
+    redThreshold.valueProperty().addListener(new ChangeListener<Number>() {
+      public void changed(ObservableValue<? extends Number> ov, Number oldValue, Number newValue) {
+        redValue.setText(String.format("%.0f", newValue));
+      }
+    });
+
+    GridPane.setConstraints(redThreshold, 1, 1);
+    grid.getChildren().add(redThreshold);
+    redValue.setTextFill(textColor);
+    GridPane.setConstraints(redValue, 2, 1);
+    grid.getChildren().add(redValue);
+
+    purpleCaption.setTextFill(textColor);
+    GridPane.setConstraints(purpleCaption, 0, 2);
+    grid.getChildren().add(purpleCaption);
+
+    purpleThreshold.valueProperty().addListener(new ChangeListener<Number>() {
+      public void changed(ObservableValue<? extends Number> ov, Number oldValue, Number newValue) {
+        purpleValue.setText(String.format("%.0f", newValue));
+      }
+    });
+    GridPane.setConstraints(purpleThreshold, 1, 2);
+    grid.getChildren().add(purpleThreshold);
+
+    purpleValue.setTextFill(textColor);
+    GridPane.setConstraints(purpleValue, 2, 2);
+    grid.getChildren().add(purpleValue);
+
+    redNumber = (int)redThreshold.getValue();
+    purpleNumber = (int)purpleThreshold.getValue();
+    settingsButton = new Button("Submit");
+
+    GridPane.setConstraints(settingsButton, 2, 6);
+    grid.getChildren().add(settingsButton);
+
+    return settings;
+
   }
 
-  private Scene ethereumScene() {
-    VBox layout = new VBox(10);
-    layout.setPadding(new Insets(20, 20,20,20));
-    layout.getChildren().addAll(colorInput, brightnessInput, button1);
-    //layout.getChildren().addAll(brightnessInput, button2);
-    scene = new Scene(layout, 300, 250);
-    return scene;
+
+  private int getKingRiverData() {
+    try {
+      final Document doc = Jsoup.connect("http://www.spk-wc.usace.army.mil/fcgi-bin/hourly.py?report=pnf&textonly=true").get();
+      String str = doc.select("body").text();
+      String strArray[] = str.split("\\s+");
+      int inflowTotal = averageInflow(strArray);
+      int outflowTotal = averageOutflow(strArray);
+      int flowPercent = inflowTotal/outflowTotal * 100;
+      return flowPercent;
+
+    }
+    catch(IOException e) {
+      System.out.println("Website inaccessible");
+      return -1;
+    }
   }
 
-  private Scene dogeCoinScene() {
-    VBox layout = new VBox(10);
-    layout.setPadding(new Insets(20, 20,20,20));
-    layout.getChildren().addAll(colorInput, brightnessInput, button1);
+  private Scene bitCoinScene(int purpleRange, int redRange, int data) {
+    double purpleInput = data/purpleRange;
+    double redInput = data/redRange;
+    //colorInput
+    if(purpleInput <= 1) {
+      colorInput = 0;
+    }
+    else if (redInput >= 1) {
+      colorInput = 99;
+    }
+    else { colorInput = (int) data;
+
+    }
+
+    ambient = new Ambient(colorInput, colorInput);
+    colorRectangle = new Rectangle(scene.getWidth() - 100, scene.getHeight() - 100, inputToColor(ambient.getColor()));
+    root = new Group();
+    root.getChildren().add(colorRectangle);
+    colorScene = new Scene(root, 300, 250, Color.BLACK);
+
+
+    //layout.getChildren().addAll(colorInput, brightnessInput, button1);
     //layout.getChildren().addAll(brightnessInput, button2);
-    scene = new Scene(layout, 300, 250);
-    return scene;
+
+    return colorScene;
+  }
+
+  private Scene ethereumScene(int purpleRange, int redRange, int data) {
+    double purpleInput = data/purpleRange;
+    double redInput = data/redRange;
+    //colorInput
+    if(purpleInput <= 1) {
+      colorInput = 0;
+    }
+    else if (redInput >= 1) {
+      colorInput = 99;
+    }
+    else { colorInput = (int) data;
+
+    }
+
+    ambient = new Ambient(colorInput, colorInput);
+    colorRectangle = new Rectangle(scene.getWidth() - 100, scene.getHeight() - 100, inputToColor(ambient.getColor()));
+    root = new Group();
+    root.getChildren().add(colorRectangle);
+    colorScene = new Scene(root, 300, 250, Color.BLACK);
+
+
+    //layout.getChildren().addAll(colorInput, brightnessInput, button1);
+    //layout.getChildren().addAll(brightnessInput, button2);
+
+    return colorScene;
+  }
+
+  private Scene dogeCoinScene(int purpleRange, int redRange, int data) {
+    double purpleInput = data/purpleRange;
+    double redInput = data/redRange;
+    //colorInput
+    if(purpleInput <= 1) {
+      colorInput = 0;
+    }
+    else if (redInput >= 1) {
+      colorInput = 99;
+    }
+    else { colorInput = (int) data;
+
+    }
+
+    ambient = new Ambient(colorInput, colorInput);
+    colorRectangle = new Rectangle(scene.getWidth() - 100, scene.getHeight() - 100, inputToColor(ambient.getColor()));
+    root = new Group();
+    root.getChildren().add(colorRectangle);
+    colorScene = new Scene(root, 300, 250, Color.BLACK);
+
+
+    //layout.getChildren().addAll(colorInput, brightnessInput, button1);
+    //layout.getChildren().addAll(brightnessInput, button2);
+
+    return colorScene;
   }
 
   private int averageInflow(String array[]) {
@@ -219,7 +414,7 @@ public class Main extends Application {
       if(isInt(array[k])) {
         int validInput = Integer.parseInt(array[k]);
         total += validInput;
-        System.out.println(array[k]);
+        //System.out.println(array[k]);
         k+=12;
         counter++;
 
