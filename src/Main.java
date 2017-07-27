@@ -1,7 +1,8 @@
-import javafx.animation.KeyFrame;
-import javafx.animation.KeyValue;
-import javafx.animation.Timeline;
+import javafx.animation.*;
 import javafx.application.Application;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.StringProperty;
 import javafx.geometry.*;
 import javafx.geometry.Insets;
 import javafx.scene.control.Slider;
@@ -31,6 +32,7 @@ import java.util.Scanner;
 import static java.lang.Math.random;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.beans.property.SimpleStringProperty;
 
 
 import org.jsoup.Jsoup;
@@ -48,7 +50,6 @@ import java.net.URL;
 public class Main extends Application {
 
 
-
   public static void main(String... args) {
     launch(args);
   }
@@ -63,27 +64,45 @@ public class Main extends Application {
   Scene choiceScene;
   Scene chosenScene;
   Scene colorScene;
-  Stage window;
+
   Scanner scan;
-  Ambient ambient;
-  Rectangle colorRectangle;
+
   Color colorOutput;
   boolean validColorInput;
   boolean validBrightnessInput;
   Group root;
-  int colorInput;
+  //int colorInput;
   TextField brightnessInput;
   int redNumber;
   int purpleNumber;
 
+  private Ambient ambient = new Ambient(88, 88);
+  private Stage window;
+  private WebData wd = new WebData();
+  private Rectangle colorRectangle;
+
+  private StringProperty rawTime = new SimpleStringProperty("0000");
+  private IntegerProperty rawData = new SimpleIntegerProperty(0);
+  private IntegerProperty rawRed = new SimpleIntegerProperty(0);
+  private IntegerProperty rawPurple = new SimpleIntegerProperty(0);
+
   @Override
   public void start(Stage primaryStage) throws Exception {
 
+    wd.getKingRiverData();
+    rawTime.setValue(String.valueOf(wd.getTime()));
+    rawData.setValue((Double.valueOf(wd.getData())));
+    rawRed.setValue(Integer.valueOf(wd.getRed()));
+    rawPurple.setValue(Integer.valueOf(wd.getPurple()));
+
+    //updateAmbient()  MAKE THIS METHOD
+    // update() MAKE THIS METHOD
+
     window = primaryStage;
     window.setTitle("Europa Ambient Device");
+    //Temporary curly brace
 
-    //Form
-    //colorInput = new TextField();
+
     brightnessInput = new TextField();
 
     button1 = new Button("Submit");
@@ -97,50 +116,34 @@ public class Main extends Application {
 
     choiceBox.setValue("King's River Inflow/Outflow");
 
+    Group root = new Group();
+    Scene appScene = new Scene(root, 300, 300);
+    colorRectangle = new Rectangle(300.0, 300.0);
+    GridPane base = new GridPane();
+
+    appScene.setRoot(base);
+    GridPane.setConstraints(colorRectangle, 0, 0);
+    base.getChildren().add(colorRectangle);
+    colorRectangle.setFill(ambient.getColorObject());
+
     // SECOND SCENE THAT SHOWS BASED ON CHOICE
     choiceButton.setOnAction(e -> {
-
       choiceScene = getChoice(choiceBox);
       window.setScene(choiceScene);
 
-        settingsButton.setOnAction(k -> {
-          colorScene = ambientScene();
-          window.setScene(confirmScene());
-            confirmButton.setOnAction(m -> {
-              window.setScene(colorScene);
-              /*try {
-                Thread.sleep(5000);
-                System.out.println("Hey");
-                while(true) {
-                  System.out.println("Hey");
-                  ambient.setColor(99);
+      settingsButton.setOnAction(k -> {
+        update();
+        window.setScene(confirmScene());
 
-                }
-
-              }
-              catch(Exception z) {
-                System.out.println("What's goin on?????");
-              }
-              ambient.setColor(99);
-              */
-              //window.setScene(colorScene);
-              /*while(true) {
-                try {
-                  Thread.sleep(5000);
-                  System.out.println("Hey");
-                  ambient.setColor(getKingRiverData());
-
-                }
-                catch(Exception z) {
-                  System.out.println("What's goin on?????");
-                }
-              }*/
-            });
+        confirmButton.setOnAction(m -> {
+          window.setScene(appScene);
         });
-
-      System.out.println("Hey" + redNumber);
-      System.out.println("You" + purpleNumber);
+      });
     });
+
+
+
+
 
     //FIRST SCENE THAT SHOWS
     VBox layout = new VBox(10);
@@ -151,7 +154,7 @@ public class Main extends Application {
     window.show();
   }
 
-  //********** STATIC METHODS **********//
+  /********** STATIC METHODS **********/
 
   private Scene confirmScene() {
     VBox layout = new VBox(10);
@@ -161,6 +164,7 @@ public class Main extends Application {
     Scene confirmScene = new Scene(layout, 300, 250);
     return confirmScene;
   }
+  /*
   private Scene ambientScene() {
     //settingsButton.setOnAction(e -> {
       chosenScene = kingRiverScene(purpleNumber, redNumber, getKingRiverData());
@@ -168,6 +172,8 @@ public class Main extends Application {
     return chosenScene;
 
   }
+
+*/
   private Scene getChoice(ChoiceBox<String> choiceBox) {
     //initialzed with empty scene to make Java happy
     //VBox layout = new VBox();
@@ -196,9 +202,11 @@ public class Main extends Application {
     return userChoice;
   }
 
-  private Scene kingRiverScene(int purpleRange, int redRange, int data) {
-    double purpleInput = data/purpleRange;
-    double redInput = data/redRange;
+
+  private void kingRiverAmbientInput() {
+    int colorInput = 0;
+    double purpleInput = wd.getData()/wd.getPurple();
+    double redInput = wd.getData()/wd.getRed();
     //colorInput
     if(purpleInput <= 1) {
       colorInput = 0;
@@ -206,21 +214,17 @@ public class Main extends Application {
     else if (redInput >= 1) {
       colorInput = 99;
     }
-    else { colorInput = (int) data;
-
+    else { colorInput = (int) wd.getData();
+    wd.setColorData(colorInput);
     }
 
-    ambient = new Ambient(colorInput, colorInput);
-    colorRectangle = new Rectangle(scene.getWidth() - 100, scene.getHeight() - 100, inputToColor(ambient.getColor()));
-    root = new Group();
-    root.getChildren().add(colorRectangle);
-    colorScene = new Scene(root, 300, 250, Color.BLACK);
+    //ambient = new Ambient(colorInput, colorInput);
+    //colorRectangle = new Rectangle(scene.getWidth() - 100, scene.getHeight() - 100, inputToColor(ambient.getColor()));
+    //root = new Group();
+    //root.getChildren().add(colorRectangle);
+    //colorScene = new Scene(root, 300, 250, Color.BLACK);
 
-
-    //layout.getChildren().addAll(colorInput, brightnessInput, button1);
-    //layout.getChildren().addAll(brightnessInput, button2);
-
-    return colorScene;
+    //return colorScene;
   }
 
   private Scene kingRiverSettings() {
@@ -277,32 +281,15 @@ public class Main extends Application {
     redNumber = (int)redThreshold.getValue();
     purpleNumber = (int)purpleThreshold.getValue();
     settingsButton = new Button("Submit");
-
+    wd.setRed(redNumber);
+    wd.setPurple(purpleNumber);
     GridPane.setConstraints(settingsButton, 2, 6);
     grid.getChildren().add(settingsButton);
 
     return settings;
 
   }
-
-
-  private int getKingRiverData() {
-    try {
-      final Document doc = Jsoup.connect("http://www.spk-wc.usace.army.mil/fcgi-bin/hourly.py?report=pnf&textonly=true").get();
-      String str = doc.select("body").text();
-      String strArray[] = str.split("\\s+");
-      int inflowTotal = averageInflow(strArray);
-      int outflowTotal = averageOutflow(strArray);
-      int flowPercent = inflowTotal/outflowTotal * 100;
-      return flowPercent;
-
-    }
-    catch(IOException e) {
-      System.out.println("Website inaccessible");
-      return -1;
-    }
-  }
-
+/*
   private Scene bitCoinScene(int purpleRange, int redRange, int data) {
     double purpleInput = data/purpleRange;
     double redInput = data/redRange;
@@ -322,11 +309,6 @@ public class Main extends Application {
     root = new Group();
     root.getChildren().add(colorRectangle);
     colorScene = new Scene(root, 300, 250, Color.BLACK);
-
-
-    //layout.getChildren().addAll(colorInput, brightnessInput, button1);
-    //layout.getChildren().addAll(brightnessInput, button2);
-
     return colorScene;
   }
 
@@ -349,11 +331,6 @@ public class Main extends Application {
     root = new Group();
     root.getChildren().add(colorRectangle);
     colorScene = new Scene(root, 300, 250, Color.BLACK);
-
-
-    //layout.getChildren().addAll(colorInput, brightnessInput, button1);
-    //layout.getChildren().addAll(brightnessInput, button2);
-
     return colorScene;
   }
 
@@ -384,50 +361,6 @@ public class Main extends Application {
     return colorScene;
   }
 
-  private int averageInflow(String array[]) {
-    int average;
-    int total = 0;
-    int counter = 0;
-    int i = 56;
-    while (i <=620) {
-      if(isInt(array[i])) {
-        int validInput = Integer.parseInt(array[i]);
-        total += validInput;
-        i+=12;
-        counter++;
-
-      }
-      else {
-        i+=12;
-      }
-    }
-    average = total/counter;
-    return average;
-  }
-
-  private int averageOutflow(String array[]) {
-    int average;
-    int total = 0;
-    int counter = 0;
-    int k = 55;
-    while (k <=619) {
-      if(isInt(array[k])) {
-        int validInput = Integer.parseInt(array[k]);
-        total += validInput;
-        //System.out.println(array[k]);
-        k+=12;
-        counter++;
-
-      }
-      else {
-        System.out.println(array[k]);
-        k+=12;
-      }
-    }
-    System.out.println(counter);
-    average = total/counter;
-    return average;
-  }
 
   private Color inputToColor(int num) {
 
@@ -491,17 +424,42 @@ public class Main extends Application {
       return false;
     }
   }
+  */
+  private void update() { //copy of updateALLL
+    Timeline newData = new Timeline(new KeyFrame(Duration.seconds(5), a -> {
+      Color oldColor = ambient.getColorObject();
+      wd.getKingRiverData();
+      rawTime.setValue(String.valueOf(wd.getTime()));
+      rawData.setValue(Double.valueOf(wd.getData()));
+      rawRed.setValue(Integer.valueOf(wd.getRed()));
+      rawPurple.setValue(Integer.valueOf(wd.getPurple()));
+      System.out.println("update() function, wd.time value: " + wd.getTime());
+      System.out.println("update() function, wd.data value: " + wd.getData());
+      System.out.println("update() function, wd.red value: " + wd.getRed());
+      System.out.println("update() function, wd.purple value: " + wd.getPurple());
+      //rawColorData.setValue(Integer.valueOf(wd.getColorData()));
+      updateAmbient();
 
-  private boolean isInt(String message) {
-    try {
-      Integer.parseInt(message);
-      return true;
+      Color newColor = ambient.getColorObject();
+      FillTransition fill = new FillTransition(Duration.seconds(5), colorRectangle, oldColor, newColor);
+      fill.setCycleCount(4); //Don't know what this does.
+      fill.setAutoReverse(true); //Also don't know what does
+      fill.play(); //what does this do?
+      colorRectangle.setFill(ambient.getColorObject());
 
-    }
-    catch(NumberFormatException e) {
-      return false;
-    }
+    }));
+
+    newData.setCycleCount(Animation.INDEFINITE);
+    newData.play();
   }
 
+    private void updateAmbient() {
+      kingRiverAmbientInput();
+      ambient.setColor(wd.getColorData());
+      System.out.println("updateAmbient() function, wd.colorData value: " + wd.getColorData());
 
-  }
+    }
+}
+
+
+
