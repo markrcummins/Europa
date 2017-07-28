@@ -58,6 +58,8 @@ public class Main extends Application {
   Button button2;
   Button choiceButton;
   Button settingsButton;
+  Button settingsButton2;
+  Button bitCoinSettingsButton;
   Button confirmButton;
   ChoiceBox<String> choiceBox;
   Scene scene;
@@ -75,31 +77,40 @@ public class Main extends Application {
   TextField brightnessInput;
   double redNumber;
   double purpleNumber;
+  double bitCoinPivotValue;
+  int choice;
 
   private Ambient ambient = new Ambient(88, 88);
   private Stage window;
   private WebData wd = new WebData();
   private Rectangle colorRectangle;
 
-  Slider redThreshold = new Slider( 0,100, 8);
+  //King River Scales
+  Slider redThreshold = new Slider( 0,99, 8);
   Label redCaption = new Label("Infield/Outfield Red Light Threshold: ");
-
-  Slider purpleThreshold = new Slider(0, 100, 7);
+  Slider purpleThreshold = new Slider(0, 99, 14);
   Label purpleCaption = new Label("Infield/Outfield Purple Light Threshold");
-  
-  private StringProperty rawTime = new SimpleStringProperty("0000");
-  private IntegerProperty rawData = new SimpleIntegerProperty(0);
-  private IntegerProperty rawRed = new SimpleIntegerProperty(0);
-  private IntegerProperty rawPurple = new SimpleIntegerProperty(0);
+  Label caption = new Label("Red Threshold > purple threshold");
+
+  //BitCoin Scales
+  Slider bitCoinRedThreshold = new Slider(0,99,8);
+  Label bitCoinRedCaption = new Label("BitCoin Loss Red Light Threshold");
+  Slider bitCoinPurpleThreshold = new Slider(0, 99, 7);
+  Label bitCoinPurpleCaption = new Label("BitCoin Gain Purple Threshold");
+
+  //private StringProperty rawTime = new SimpleStringProperty("0000");
+  //private IntegerProperty rawData = new SimpleIntegerProperty(0);
+  //private IntegerProperty rawRed = new SimpleIntegerProperty(0);
+  //private IntegerProperty rawPurple = new SimpleIntegerProperty(0);
 
   @Override
   public void start(Stage primaryStage) throws Exception {
 
-    wd.getKingRiverData();
-    rawTime.setValue(String.valueOf(wd.getTime()));
-    rawData.setValue((Double.valueOf(wd.getData())));
-    rawRed.setValue(Double.valueOf(wd.getRed()));
-    rawPurple.setValue(Double.valueOf(wd.getPurple()));
+    //wd.getKingRiverData();
+    //rawTime.setValue(String.valueOf(wd.getTime()));
+    //rawData.setValue((Double.valueOf(wd.getData())));
+    //rawRed.setValue(Double.valueOf(wd.getRed()));
+    //rawPurple.setValue(Double.valueOf(wd.getPurple()));
 
     //updateAmbient()  MAKE THIS METHOD
     // update() MAKE THIS METHOD
@@ -117,9 +128,8 @@ public class Main extends Application {
     choiceBox = new ChoiceBox();
     choiceBox.getItems().add("King's River Inflow/Outflow");
     choiceBox.getItems().add("BitCoin Tracker");
-    choiceBox.getItems().add("Ethereum Tracker");
-    choiceBox.getItems().add("DogeCoin Tracker");
-
+    //choiceBox.getItems().add("Ethereum Tracker");
+    //choiceBox.getItems().add("DogeCoin Tracker");
     choiceBox.setValue("King's River Inflow/Outflow");
 
     Group root = new Group();
@@ -137,18 +147,33 @@ public class Main extends Application {
       choiceScene = getChoice(choiceBox);
       window.setScene(choiceScene);
 
-      settingsButton.setOnAction(k -> {
-        wd.setRed(redNumber);
-        wd.setPurple(purpleNumber);
-        System.out.println(wd.getRed());
-        System.out.println(wd.getPurple());
-        update();
-        window.setScene(confirmScene());
+      //If BitCoin was chosen
+      settingsButton.setOnAction(s -> {
 
-        confirmButton.setOnAction(m -> {
-          window.setScene(appScene);
-        });
+        if(choice == 1 && redThreshold.getValue() < purpleThreshold.getValue()) {
+          System.out.println("hello");
+
+        window.setScene(choiceScene);
+        }
+        else {
+          generalUpdate();
+          //wd.setRed(redNumber);
+          //wd.setPurple(purpleNumber);
+          //System.out.println(wd.getRed());
+          //System.out.println(wd.getPurple());
+          window.setScene(confirmScene());
+
+          confirmButton.setOnAction(m -> {
+            window.setScene(appScene);
+          });
+        }
       });
+      //If King River Basin was chosen
+
+
+
+
+
     });
 
 
@@ -159,7 +184,7 @@ public class Main extends Application {
     VBox layout = new VBox(10);
     layout.setPadding(new Insets(20, 20, 20, 20));
     layout.getChildren().addAll(choiceBox, choiceButton);
-    scene = new Scene(layout, 300, 250);
+    scene = new Scene(layout, 400, 350);
     window.setScene(scene);
     window.show();
   }
@@ -191,36 +216,74 @@ public class Main extends Application {
 
     //Gonna assign choices to a number so that it's easier to set different scenes later on
     if(choiceBox.getValue().equals("King's River Inflow/Outflow")) {
+      choice = 1;
       userChoice = kingRiverSettings();
     }
-   else if(choiceBox.getValue().equals("BitCoin Tracker")) {
+   else {// {
       //Temporary fix
       //userChoice = bitCoinScene();
-      userChoice = kingRiverSettings();
+      choice = 0;
+      userChoice = bitCoinSettings();
     }
-    else if(choiceBox.getValue().equals("Ethereum Tracker")) {
-      //Temporary fix
-      //userChoice = ethereumScene();
-      userChoice = kingRiverSettings();
-    }
-    else { //if the choice was the DogeCoin Traker
-      //Temporary fix
-      //userChoice = dogeCoinScene();
-      userChoice = kingRiverSettings();
-    }
+
 
     return userChoice;
   }
-
-
+  private void generalAmbientInput() {
+    if (choice == 1) {
+      kingRiverAmbientInput();
+    }
+    else if(choice == 0) {
+      bitCoinAmbientInput();
+    }
+  }
+  private void bitCoinAmbientInput() {
+    int colorInput = 0;
+    double inBetweener = 0;
+    wd.setRed(Math.round(bitCoinRedThreshold.getValue()));
+    wd.setPurple(Math.round(bitCoinPurpleThreshold.getValue()));
+    System.out.println("bitCoinAmbientInput bitCoinredThreshold.getValue(): " + bitCoinRedThreshold.getValue());
+    System.out.println("bitCoinAmbientInput bitCoinpurpleThreshold.getValue(): " + bitCoinPurpleThreshold.getValue());
+    System.out.println("bitCoinAmbientInput wd.getRed(): " + wd.getRed());
+    System.out.println("bitCoinAmbientInput wd.getPurple(): " + wd.getPurple());
+    double currentValue = wd.getData() - bitCoinPivotValue;
+    double purpleInput = currentValue/wd.getPurple();
+    double redInput = currentValue/wd.getRed();
+    System.out.println("wd.getData: " + wd.getData());
+    System.out.println("bitCoinPivotValue: "+ bitCoinPivotValue);
+    System.out.println("currentValue: " + currentValue);
+    System.out.println("purpleInput: " + purpleInput);
+    System.out.println("redInput: " + redInput);
+    if(purpleInput >= 1) {
+      System.out.println("You reached here!");
+      colorInput = 0;
+      wd.setColorData(colorInput);
+    }
+    else if(redInput <= -1) {
+      System.out.println("Youve reached there!");
+      colorInput = 99;
+      wd.setColorData(colorInput);
+    }
+    else {
+      System.out.println("You've hit the else statement!");
+      inBetweener = currentValue + wd.getRed();
+      inBetweener = (inBetweener/(wd.getPurple() + wd.getRed())) * 100;
+      System.out.println("Value of inBetweener: " + inBetweener);
+      colorInput =100 - (int)inBetweener;
+      System.out.println("Value of inBetweener after turning into an int: " + inBetweener);
+      System.out.println("bitCoinAmbientInput colorInput: " + colorInput);
+      wd.setColorData(colorInput);
+    }
+    System.out.println("bitCoinAmbientInput final colorInput: " + wd.getColorData());
+  }
   private void kingRiverAmbientInput() {
     int colorInput = 0;
     double inBetweener = 0;
     System.out.println("kingRiverAmbientInput wd.getPurple(): " + wd.getPurple());
     System.out.println("kingRiverAmbientInput wd.getRed(): " + wd.getRed());
     System.out.println("kingRiverAmbientInput wd.getData(): " + wd.getData());
-    wd.setRed(redThreshold.getValue());
-    wd.setPurple(purpleThreshold.getValue());
+    wd.setRed(Math.round(redThreshold.getValue()));
+    wd.setPurple(Math.round(purpleThreshold.getValue()));
     System.out.println("kingRiverAmbientInput redThreshold.getValue(): " + redThreshold.getValue());
     System.out.println("kingRiverAmbientInput purpleThreshold.getValue(): " + purpleThreshold.getValue());
     System.out.println("kingRiverAmbientInput wd.getRed(): " + wd.getRed());
@@ -239,10 +302,10 @@ public class Main extends Application {
       wd.setColorData(colorInput);
     }
     else {
-      inBetweener = purpleInput;
-      inBetweener = (inBetweener/(wd.getRed()-wd.getPurple())) * 100;
+      inBetweener = wd.getData() - wd.getPurple();
+      inBetweener = (inBetweener/(wd.getRed() - wd.getPurple())) * 100;
       System.out.println("Value of inBetweener: " + inBetweener);
-      colorInput = (int) inBetweener;
+      colorInput = 100 - (int)inBetweener;
       System.out.println("Value of inBetweener after turning into an int: " + inBetweener);
       System.out.println("kingRiverAmbientInput colorInput: " + colorInput);
       wd.setColorData(colorInput);
@@ -256,7 +319,16 @@ public class Main extends Application {
     System.out.println("kingRiverAmbientInput final colorInput: " + wd.getColorData());
     //return colorScene;
   }
-
+  private Scene generalSettings() {
+    if (choice == 1) {
+      return kingRiverSettings();
+    }
+    else if (choice == 0) {
+      return bitCoinSettings();
+    }
+    System.out.println("Something fucked up");
+    return null;
+  }
   private Scene kingRiverSettings() {
 
 
@@ -268,7 +340,7 @@ public class Main extends Application {
 
     Color textColor = Color.BLACK;
     Group root = new Group();
-    Scene settings = new Scene(root, 600, 600);
+    Scene settings = new Scene(root, 700, 700);
     GridPane grid = new GridPane();
     grid.setPadding(new Insets(10, 10, 10, 10));
     grid.setVgap(10);
@@ -277,6 +349,7 @@ public class Main extends Application {
 
     redCaption.setTextFill(textColor);
     purpleCaption.setTextFill(textColor);
+    caption.setTextFill(textColor);
     GridPane.setConstraints(redCaption, 0, 1);
     grid.getChildren().add(redCaption);
 
@@ -295,6 +368,8 @@ public class Main extends Application {
     purpleCaption.setTextFill(textColor);
     GridPane.setConstraints(purpleCaption, 0, 2);
     grid.getChildren().add(purpleCaption);
+    GridPane.setConstraints(caption, 0, 3);
+    grid.getChildren().add(caption);
 
     purpleThreshold.valueProperty().addListener(new ChangeListener<Number>() {
       public void changed(ObservableValue<? extends Number> ov, Number oldValue, Number newValue) {
@@ -317,84 +392,75 @@ public class Main extends Application {
     wd.setPurple(purpleNumber);
     System.out.println("Red threshold value: " + wd.getRed());
     System.out.println("Purple threshold value: " + wd.getPurple());
+    GridPane.setConstraints(settingsButton, 2, 10);
+    grid.getChildren().add(settingsButton);
+    return settings;
+
+  }
+
+  private Scene bitCoinSettings() {
+    wd.getBitCoinData();
+    bitCoinPivotValue = wd.getData();
+    Label bitCoinRedValue = new Label(Double.toString(bitCoinRedThreshold.getValue()));
+    Label bitCoinPurpleValue = new Label(Double.toString(bitCoinPurpleThreshold.getValue()));
+
+    Color textColor = Color.BLACK;
+    Group root = new Group();
+    Scene settings = new Scene(root, 700, 700);
+    GridPane grid = new GridPane();
+    grid.setPadding(new Insets(10, 10, 10, 10));
+    grid.setVgap(10);
+    grid.setHgap(70);
+    settings.setRoot(grid);
+
+    bitCoinRedCaption.setTextFill(textColor);
+    bitCoinPurpleCaption.setTextFill(textColor);
+    GridPane.setConstraints(bitCoinRedCaption, 0, 1);
+    grid.getChildren().add(bitCoinRedCaption);
+
+    bitCoinRedThreshold.valueProperty().addListener(new ChangeListener<Number>() {
+      public void changed(ObservableValue<? extends Number> ov, Number oldValue, Number newValue) {
+        bitCoinRedValue.setText(String.format("%.0f", newValue));
+      }
+    });
+
+    GridPane.setConstraints(bitCoinRedThreshold, 1, 1);
+    grid.getChildren().add(bitCoinRedThreshold);
+    bitCoinRedValue.setTextFill(textColor);
+    GridPane.setConstraints(bitCoinRedValue, 2, 1);
+    grid.getChildren().add(bitCoinRedValue);
+
+    bitCoinPurpleCaption.setTextFill(textColor);
+    GridPane.setConstraints(bitCoinPurpleCaption, 0, 2);
+    grid.getChildren().add(bitCoinPurpleCaption);
+
+    bitCoinPurpleThreshold.valueProperty().addListener(new ChangeListener<Number>() {
+      public void changed(ObservableValue<? extends Number> ov, Number oldValue, Number newValue) {
+        bitCoinPurpleValue.setText(String.format("%.0f", newValue));
+      }
+    });
+    GridPane.setConstraints(bitCoinPurpleThreshold, 1, 2);
+    grid.getChildren().add(bitCoinPurpleThreshold);
+
+    bitCoinPurpleValue.setTextFill(textColor);
+    GridPane.setConstraints(bitCoinPurpleValue, 2, 2);
+    grid.getChildren().add(bitCoinPurpleValue);
+
+    redNumber = bitCoinRedThreshold.getValue();
+    System.out.println("bitCoinRedThreshold value: " + redNumber);
+    purpleNumber = bitCoinPurpleThreshold.getValue();
+    System.out.println("bitCoinPurpleThreshold value: " + purpleNumber);
+    settingsButton = new Button("Submit");
+    wd.setRed(redNumber);
+    wd.setPurple(purpleNumber);
+    System.out.println("bitCoin Red threshold value: " + wd.getRed());
+    System.out.println("butCoin Purple threshold value: " + wd.getPurple());
     GridPane.setConstraints(settingsButton, 2, 6);
     grid.getChildren().add(settingsButton);
 
     return settings;
 
   }
-/*
-  private Scene bitCoinScene(int purpleRange, int redRange, int data) {
-    double purpleInput = data/purpleRange;
-    double redInput = data/redRange;
-    //colorInput
-    if(purpleInput <= 1) {
-      colorInput = 0;
-    }
-    else if (redInput >= 1) {
-      colorInput = 99;
-    }
-    else { colorInput = (int) data;
-
-    }
-
-    ambient = new Ambient(colorInput, colorInput);
-    colorRectangle = new Rectangle(scene.getWidth() - 100, scene.getHeight() - 100, inputToColor(ambient.getColor()));
-    root = new Group();
-    root.getChildren().add(colorRectangle);
-    colorScene = new Scene(root, 300, 250, Color.BLACK);
-    return colorScene;
-  }
-
-  private Scene ethereumScene(int purpleRange, int redRange, int data) {
-    double purpleInput = data/purpleRange;
-    double redInput = data/redRange;
-    //colorInput
-    if(purpleInput <= 1) {
-      colorInput = 0;
-    }
-    else if (redInput >= 1) {
-      colorInput = 99;
-    }
-    else { colorInput = (int) data;
-
-    }
-
-    ambient = new Ambient(colorInput, colorInput);
-    colorRectangle = new Rectangle(scene.getWidth() - 100, scene.getHeight() - 100, inputToColor(ambient.getColor()));
-    root = new Group();
-    root.getChildren().add(colorRectangle);
-    colorScene = new Scene(root, 300, 250, Color.BLACK);
-    return colorScene;
-  }
-
-  private Scene dogeCoinScene(int purpleRange, int redRange, int data) {
-    double purpleInput = data/purpleRange;
-    double redInput = data/redRange;
-    //colorInput
-    if(purpleInput <= 1) {
-      colorInput = 0;
-    }
-    else if (redInput >= 1) {
-      colorInput = 99;
-    }
-    else { colorInput = (int) data;
-
-    }
-
-    ambient = new Ambient(colorInput, colorInput);
-    colorRectangle = new Rectangle(scene.getWidth() - 100, scene.getHeight() - 100, inputToColor(ambient.getColor()));
-    root = new Group();
-    root.getChildren().add(colorRectangle);
-    colorScene = new Scene(root, 300, 250, Color.BLACK);
-
-
-    //layout.getChildren().addAll(colorInput, brightnessInput, button1);
-    //layout.getChildren().addAll(brightnessInput, button2);
-
-    return colorScene;
-  }
-
 
   private Color inputToColor(int num) {
 
@@ -458,13 +524,43 @@ public class Main extends Application {
       return false;
     }
   }
-  */
+  private void generalUpdate() {
+    if(choice == 1) {
+      update();
+    }
+    else if(choice == 0) {
+      bitCoinUpdate();
+    }
+  }
+  private void bitCoinUpdate() {
+    Timeline newData = new Timeline(new KeyFrame(Duration.seconds(5), a -> {
+      Color oldColor = ambient.getColorObject();
+      wd.getBitCoinData();
+      System.out.println("bitCoinPpdate() function, wd.time value: " + wd.getTime());
+      System.out.println("bitCoinUpdate() function, wd.data value: " + wd.getData());
+      System.out.println("bitCoinUpdate() function, wd.red value: " + wd.getRed());
+      System.out.println("bitCoinUpdate() function, wd.purple value: " + wd.getPurple());
+      bitCoinAmbientInput();
+      updateAmbient();
+
+      Color newColor = ambient.getColorObject();
+      FillTransition fill = new FillTransition(Duration.seconds(5), colorRectangle, oldColor, newColor);
+      fill.setCycleCount(4); //Don't know what this does.
+      fill.setAutoReverse(true); //Also don't know what does
+      fill.play(); //what does this do?
+      colorRectangle.setFill(ambient.getColorObject());
+
+    }));
+
+    newData.setCycleCount(Animation.INDEFINITE);
+    newData.play();
+  }
   private void update() { //copy of updateALLL
     Timeline newData = new Timeline(new KeyFrame(Duration.seconds(5), a -> {
       Color oldColor = ambient.getColorObject();
       wd.getKingRiverData();
-      rawTime.setValue(String.valueOf(wd.getTime()));
-      rawData.setValue(Double.valueOf(wd.getData()));
+      //rawTime.setValue(String.valueOf(wd.getTime()));
+      //rawData.setValue(Double.valueOf(wd.getData()));
       //rawRed.setValue(Double.valueOf(wd.getRed()));
       //rawPurple.setValue(Double.valueOf(wd.getPurple()));
       System.out.println("update() function, wd.time value: " + wd.getTime());
@@ -490,7 +586,7 @@ public class Main extends Application {
   }
 
     private void updateAmbient() {
-      kingRiverAmbientInput();
+      //kingRiverAmbientInput();
       ambient.setColor(wd.getColorData());
       System.out.println("updateAmbient() function, wd.colorData value: " + wd.getColorData());
 

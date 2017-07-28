@@ -51,6 +51,23 @@ public class WebData {
       }
     }
 
+  public void getBitCoinData() {
+    try {
+      String bitCoinPrice = " ";
+      final Document doc = Jsoup.connect("http://www.xe.com/currency/xbt-bitcoin").get();
+      for(Element row: doc.select("table.table-xrates")) {
+        String a = row.select(".rateCell").text();
+        String data[] = a.split("\\s+");
+        bitCoinPrice = data[0];
+      }
+      this.data = Double.parseDouble(bitCoinPrice);
+      System.out.println("getBitCoinData() value of bitCoin: "+ this.data);
+    }
+    catch(IOException e) {
+      System.out.println("Website inaccessible");
+    }
+  }
+
   private int averageInflow(String array[]) {
     int average;
     int total = 0;
