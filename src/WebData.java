@@ -6,7 +6,7 @@ import java.io.IOException;
 
 public class WebData {
 
-  private String time, urlStream;
+  private String time;
   private int  colorData;
   private double data, red, purple;
 
@@ -37,19 +37,19 @@ public class WebData {
         String strArray[] = str.split("\\s+");
         double inflowTotal = averageInflow(strArray);
         double outflowTotal = averageOutflow(strArray);
-        System.out.println("inflowTotal: " + inflowTotal);
-        System.out.println("outflowTotal: " + outflowTotal);
-        System.out.println("???: " + (inflowTotal/outflowTotal)*100);
+        //System.out.println("inflowTotal: " + inflowTotal);
+        //System.out.println("outflowTotal: " + outflowTotal);
+        //System.out.println("???: " + (inflowTotal/outflowTotal)*100);
         double flowPercent = inflowTotal/outflowTotal * 100;
 
         this.data = flowPercent;
-        System.out.println("Flow Percent value: " + flowPercent);
-        System.out.println("this.data value: " + this.data);
+        //System.out.println("Flow Percent value: " + flowPercent);
+        //System.out.println("this.data value: " + this.data);
       }
       catch(IOException e) {
-        System.out.println("Website inaccessible");
+        //System.out.println("Website inaccessible");
       }
-    }
+  }
 
   public void getBitCoinData() {
     try {
@@ -61,10 +61,10 @@ public class WebData {
         bitCoinPrice = data[0];
       }
       this.data = Double.parseDouble(bitCoinPrice);
-      System.out.println("getBitCoinData() value of bitCoin: "+ this.data);
+      //System.out.println("getBitCoinData() value of bitCoin: "+ this.data);
     }
     catch(IOException e) {
-      System.out.println("Website inaccessible");
+      //System.out.println("Website inaccessible");
     }
   }
 
@@ -87,42 +87,39 @@ public class WebData {
       }
     }
     average = total/counter;
-    System.out.println("Average Inflow: " + average);
+    //System.out.println("Average Inflow: " + average);
     return average;
   }
 
-    private int averageOutflow(String array[]) {
-      int average;
-      int total = 0;
-      int counter = 0;
-      int k = 55;
-      while (k <=619) {
-        if(isInt(array[k])) {
-          int validInput = Integer.parseInt(array[k]);
-          total += validInput;
-          k+=12;
-          counter++;
-
-        }
-        else {
-          System.out.println(array[k]);
-          k+=12;
-        }
+  private int averageOutflow(String array[]) {
+    int average;
+    int total = 0;
+    int counter = 0;
+    int k = 55;
+    while (k <=619) {
+      if(isInt(array[k])) {
+        int validInput = Integer.parseInt(array[k]);
+        total += validInput;
+        k+=12;
+        counter++;
       }
-
-      average = total/counter;
-      System.out.println("Average Outflow: " + average);
-      return average;
-    }
-
-    private boolean isInt(String message) {
-      try {
-        Integer.parseInt(message);
-        return true;
-
-      }
-      catch(NumberFormatException e) {
-        return false;
+      else {
+        System.out.println(array[k]);
+        k+=12;
       }
     }
+    average = total/counter;
+    //System.out.println("Average Outflow: " + average);
+    return average;
+  }
+
+  private boolean isInt(String message) {
+    try {
+      Integer.parseInt(message);
+      return true;
+    }
+    catch(NumberFormatException e) {
+      return false;
+    }
+  }
 }

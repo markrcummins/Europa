@@ -41,7 +41,7 @@ public class Ambient
     double hueVal = 300.0;
 
     hueVal = 300.0 + (double) color * (0.6);
-    System.out.println("convToHue function hueVal value: " + hueVal);
+    //System.out.println("convToHue function hueVal value: " + hueVal);
     return hueVal;
   }
 
@@ -54,8 +54,8 @@ public class Ambient
     hueVal = convToHue(this.colorVariance);
     saturation = 1.0;
     brightness = this.colorVariance - 49.5;
-    brightness = (((Math.abs(brightness)*2)+1)/100);
-    System.out.println("Brightness value: " + brightness);
+    brightness = Math.round(((Math.abs(brightness)*2)+1)/100);
+    //System.out.println("Brightness value: " + brightness);
 
     ambColor = Color.hsb(hueVal, saturation, brightness);
 
