@@ -7,8 +7,8 @@ import java.io.IOException;
 public class WebData {
 
   private String time, urlStream;
-  private int red, purple, colorData;
-  private double data;
+  private int  colorData;
+  private double data, red, purple;
 
   public WebData() {
 
@@ -23,10 +23,10 @@ public class WebData {
   public void setTime(String time) {this.time = time;}
   public double getData() {return data;}
   public void setData(int data) {this.data = data;}
-  public int getRed() {return red;}
-  public void setRed(int red) {this.red = red;}
-  public int getPurple() {return purple;}
-  public void setPurple(int purple) {this.purple = purple;}
+  public double getRed() {return red;}
+  public void setRed(double red) {this.red = red;}
+  public double getPurple() {return purple;}
+  public void setPurple(double purple) {this.purple = purple;}
   public int getColorData() {return colorData;}
   public void setColorData(int colorData) {this.colorData = colorData;}
 
