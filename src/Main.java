@@ -153,25 +153,14 @@ public class Main extends Application {
     double inBetweener = 0;
     wd.setRed(Math.round(bitCoinRedThreshold.getValue()));
     wd.setPurple(Math.round(bitCoinPurpleThreshold.getValue()));
-    //System.out.println("bitCoinAmbientInput bitCoinredThreshold.getValue(): " + bitCoinRedThreshold.getValue());
-    //System.out.println("bitCoinAmbientInput bitCoinpurpleThreshold.getValue(): " + bitCoinPurpleThreshold.getValue());
-    //System.out.println("bitCoinAmbientInput wd.getRed(): " + wd.getRed());
-    //System.out.println("bitCoinAmbientInput wd.getPurple(): " + wd.getPurple());
     double currentValue = wd.getData() - bitCoinPivotValue;
     double purpleInput = currentValue/wd.getPurple();
     double redInput = currentValue/wd.getRed();
-    //System.out.println("wd.getData: " + wd.getData());
-    //System.out.println("bitCoinPivotValue: "+ bitCoinPivotValue);
-    //System.out.println("currentValue: " + currentValue);
-    //System.out.println("purpleInput: " + purpleInput);
-    //System.out.println("redInput: " + redInput);
     if(purpleInput >= 1) {
-      //System.out.println("You reached here!");
       colorInput = 0;
       wd.setColorData(colorInput);
     }
     else if(redInput <= -1) {
-      //System.out.println("Youve reached there!");
       colorInput = 99;
       wd.setColorData(colorInput);
     }
@@ -179,31 +168,18 @@ public class Main extends Application {
       //System.out.println("You've hit the else statement!");
       inBetweener = currentValue + wd.getRed();
       inBetweener = (inBetweener/(wd.getPurple() + wd.getRed())) * 100;
-      //System.out.println("Value of inBetweener: " + inBetweener);
       colorInput =100 - (int)inBetweener;
-      //System.out.println("Value of inBetweener after turning into an int: " + inBetweener);
-      //System.out.println("bitCoinAmbientInput colorInput: " + colorInput);
       wd.setColorData(colorInput);
     }
-    //System.out.println("bitCoinAmbientInput final colorInput: " + wd.getColorData());
   }
 
   private void kingRiverAmbientInput() {
     int colorInput = 0;
     double inBetweener = 0;
-    //System.out.println("kingRiverAmbientInput wd.getPurple(): " + wd.getPurple());
-    //System.out.println("kingRiverAmbientInput wd.getRed(): " + wd.getRed());
-    //System.out.println("kingRiverAmbientInput wd.getData(): " + wd.getData());
     wd.setRed(Math.round(redThreshold.getValue()));
     wd.setPurple(Math.round(purpleThreshold.getValue()));
-    //System.out.println("kingRiverAmbientInput redThreshold.getValue(): " + redThreshold.getValue());
-    //System.out.println("kingRiverAmbientInput purpleThreshold.getValue(): " + purpleThreshold.getValue());
-    //System.out.println("kingRiverAmbientInput wd.getRed(): " + wd.getRed());
-    //System.out.println("kingRiverAmbientInput wd.getPurple(): " + wd.getPurple());
     double purpleInput = wd.getData()/wd.getPurple();
     double redInput = wd.getData()/wd.getRed();
-    //System.out.println("kingRiverAmbientInput purpleInput: " + purpleInput);
-    //System.out.println("kingRiverAmbientInput redInput: " + redInput);
     if(purpleInput <= 1) {
       colorInput = 0;
       wd.setColorData(colorInput);
@@ -215,13 +191,9 @@ public class Main extends Application {
     else {
       inBetweener = wd.getData() - wd.getPurple();
       inBetweener = (inBetweener/(wd.getRed() - wd.getPurple())) * 100;
-      //System.out.println("Value of inBetweener: " + inBetweener);
       colorInput = 100 - (int)inBetweener;
-      //System.out.println("Value of inBetweener after turning into an int: " + inBetweener);
-      //System.out.println("kingRiverAmbientInput colorInput: " + colorInput);
       wd.setColorData(colorInput);
     }
-    //System.out.println("kingRiverAmbientInput final colorInput: " + wd.getColorData());
   }
 
   private Scene generalSettings() {
@@ -285,14 +257,10 @@ public class Main extends Application {
     grid.getChildren().add(purpleValue);
 
     redNumber = redThreshold.getValue();
-    //System.out.println("redThreshold value: " + redNumber);
     purpleNumber = purpleThreshold.getValue();
-    //System.out.println("purpleThreshold value: " + purpleNumber);
     settingsButton = new Button("Submit");
     wd.setRed(redNumber);
     wd.setPurple(purpleNumber);
-    //System.out.println("Red threshold value: " + wd.getRed());
-    //System.out.println("Purple threshold value: " + wd.getPurple());
     GridPane.setConstraints(settingsButton, 2, 10);
     grid.getChildren().add(settingsButton);
 
@@ -348,14 +316,10 @@ public class Main extends Application {
     grid.getChildren().add(bitCoinPurpleValue);
 
     redNumber = bitCoinRedThreshold.getValue();
-    //System.out.println("bitCoinRedThreshold value: " + redNumber);
     purpleNumber = bitCoinPurpleThreshold.getValue();
-    //System.out.println("bitCoinPurpleThreshold value: " + purpleNumber);
     settingsButton = new Button("Submit");
     wd.setRed(redNumber);
     wd.setPurple(purpleNumber);
-    //System.out.println("bitCoin Red threshold value: " + wd.getRed());
-    //System.out.println("butCoin Purple threshold value: " + wd.getPurple());
     GridPane.setConstraints(settingsButton, 2, 6);
     grid.getChildren().add(settingsButton);
 
@@ -367,15 +331,12 @@ public class Main extends Application {
 
       int range = Integer.parseInt(input.getText());
       if(range < 100 && range >= 0) {
-        //System.out.println("User inputted: " + range);
         return true;
       }
       else {
-        //System.out.println("Please input a number between 0 to 99.");
         return false;
       }
     }catch(NumberFormatException e){
-      //System.out.println("Error: " + message + " is not an integer");
       return false;
     }
   }
@@ -393,10 +354,6 @@ public class Main extends Application {
     Timeline newData = new Timeline(new KeyFrame(Duration.seconds(5), a -> {
       Color oldColor = ambient.getColorObject();
       wd.getBitCoinData();
-      //System.out.println("bitCoinPpdate() function, wd.time value: " + wd.getTime());
-      //System.out.println("bitCoinUpdate() function, wd.data value: " + wd.getData());
-      //System.out.println("bitCoinUpdate() function, wd.red value: " + wd.getRed());
-      //System.out.println("bitCoinUpdate() function, wd.purple value: " + wd.getPurple());
       bitCoinAmbientInput();
       updateAmbient();
 
@@ -415,10 +372,6 @@ public class Main extends Application {
     Timeline newData = new Timeline(new KeyFrame(Duration.seconds(5), a -> {
       Color oldColor = ambient.getColorObject();
       wd.getKingRiverData();
-      //System.out.println("update() function, wd.time value: " + wd.getTime());
-      //System.out.println("update() function, wd.data value: " + wd.getData());
-      //System.out.println("update() function, wd.red value: " + wd.getRed());
-      //System.out.println("update() function, wd.purple value: " + wd.getPurple());
       kingRiverAmbientInput();
       updateAmbient();
 
@@ -434,9 +387,7 @@ public class Main extends Application {
   }
 
     private void updateAmbient() {
-      //kingRiverAmbientInput();
       ambient.setColor(wd.getColorData());
-      //System.out.println("updateAmbient() function, wd.colorData value: " + wd.getColorData());
     }
 }
 
